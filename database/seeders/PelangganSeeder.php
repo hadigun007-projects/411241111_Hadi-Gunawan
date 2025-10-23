@@ -22,6 +22,8 @@ class PelangganSeeder extends Seeder
                 'email' => $faker->unique()->safeEmail,
                 'no_hp' => '08' . $faker->randomNumber(9, true), 
                 'alamat' => $faker->address,
+                'created_at'         => now(),
+                'updated_at'         => now(),
             ]);
         }
     }
