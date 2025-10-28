@@ -41,8 +41,8 @@
     <h1 style="margin: 2rem 0;">Laporan Data</h1>
 
     <div class="tabs" role="tablist" aria-label="Laporan Tabs">
-      <button class="tab-btn" role="tab" id="tab-pelanggan" aria-controls="panel-pelanggan" aria-selected="true">Pelanggan</button>
-      <button class="tab-btn" role="tab" id="tab-transaksi" aria-controls="panel-transaksi" aria-selected="false">Transaksi</button>
+      <button class="tab-btn" role="tab" id="tab-pelanggan" aria-controls="panel-pelanggan" aria-selected="true">Pelanggan {{count($pelanggan)}}</button>
+      <button class="tab-btn" role="tab" id="tab-transaksi" aria-controls="panel-transaksi" aria-selected="false">Transaksi {{count($transaksi)}}</button>
       <button class="tab-btn" role="tab" id="tab-join" aria-controls="panel-join" aria-selected="false">Hasil Join</button>
     </div>
 
