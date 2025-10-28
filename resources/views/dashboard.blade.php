@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>Laporan Pelanggan & Transaksi</title>
   <style>
     :root { --primary:#1f6feb; --border:#e5e7eb; --muted:#6b7280; }
@@ -144,6 +145,7 @@
                 <th>No HP</th>
                 <th>Tanggal Transaksi</th>
                 <th class="right">Total Transaksi</th>
+                <th>Aksi</th>
               </tr>
               </thead>
               <tbody>
@@ -155,6 +157,10 @@
                   <td><span class="badge">{{ $row->no_hp }}</span></td>
                   <td>{{ \Illuminate\Support\Carbon::parse($row->tanggal_transaksi)->format('Y-m-d H:i') }}</td>
                   <td class="right">Rp {{ number_format($row->total_transaksi, 0, ',', '.') }}</td>
+                  <td style="display:flex; justify-content:flex-end;gap: 10px;">
+                    <button style="cursor:pointer;" type="button">Edit</button>
+                    <button style="cursor:pointer;" onclick="deleteTransaksi({{$row->id_transaksi}})" type="button">Hapus</button>
+                  </td>
                 </tr>
               @endforeach
               </tbody>
@@ -177,14 +183,11 @@
 
     <h3 style="margin:0 0 16px 0;">Tambah Transaksi Baru</h3>
 
-    <form method="POST">
-      @csrf
-
       <div style="margin-bottom:12px;">
         <label for="id_pelanggan">Pelanggan</label><br>
         <select name="id_pelanggan" id="id_pelanggan" style="width:100%; padding:8px;">
           @foreach($pelanggan as $p)
-            <option value="{{ $p->id_pelanggan }}">{{ $p->nama_pelanggan }} - {{ $p->email }}</option>
+            <option value="{{ $p->id_pelanggan }}">{{ $p->nama_pelanggan }}</option>
           @endforeach
         </select>
       </div>
@@ -199,16 +202,20 @@
         <input type="number" name="total_transaksi" id="total_transaksi" style="width:100%; padding:8px;" required>
       </div>
 
-      <button type="submit" style="padding:10px 14px; background:#1f6feb; color:white; border:none; border-radius:6px; cursor:pointer;">
+      <button type="submit" onclick="createTransaksi()" style="padding:10px 14px; background:#1f6feb; color:white; border:none; border-radius:6px; cursor:pointer;">
         Simpan
       </button>
 
-    </form>
   </div>
 </div>
   </div>
 
   <script>
+
+
+
+
+    
     // Tab logic (vanilla JS, accessible-ish)
     (function () {
       const tabs = document.querySelectorAll('[role="tab"]');
@@ -257,6 +264,73 @@
         modal.style.display = 'none';
       }
     });
+
+     async function createTransaksi() {
+      const id_pelanggan = document.getElementById('id_pelanggan').value
+      const tanggal_transaksi = document.getElementById('tanggal_transaksi').value
+      const total_transaksi = document.getElementById('total_transaksi').value
+
+      if(id_pelanggan === '' || tanggal_transaksi === '' || total_transaksi === ''){
+        alert('Semua field harus diisi')
+        return
+      }
+
+      const res = await fetch('/create', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          id_pelanggan,
+          tanggal_transaksi,
+          total_transaksi
+        })
+      })
+
+      const data = await res.json()
+
+      if(data.success){
+        alert(data.message)
+        modal.style.display = 'none';
+        location.reload()
+      }else{
+        alert(data.message)
+      }
+    }
+     
+    
+    async function deleteTransaksi(id) {
+      if(!confirm("Yakin mau hapus data?: " + id)){
+        alert('Hapus data dibatalkan.')
+        return;
+      }
+
+      const res = await fetch('/destroy/'+id, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+      })
+
+     let data
+try {
+  data = await res.json()
+} catch (e) {
+  alert('Gagal menghapus: respon tidak valid.')
+  return
+}
+
+      if(data.success){
+        alert(data.message)
+        modal.style.display = 'none';
+        location.reload()
+      }else{
+        alert(data.message)
+      }
+    }
 
   </script>
 </body>

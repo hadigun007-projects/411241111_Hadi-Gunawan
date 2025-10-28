@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('total_transaksi');
             $table->timestamps();
 
+            dd();
             $table->foreign('id_pelanggan')->references('id_pelanggan')->on('t_pelanggan')->onDelete('cascade');
         });
     }
