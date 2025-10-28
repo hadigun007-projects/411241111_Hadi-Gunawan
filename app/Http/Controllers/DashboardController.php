@@ -64,6 +64,31 @@ public function destroy(int $id)
 }
 
 
+public function edit(Request $request, int $id)
+{
+    
+    $request->validate([
+            'id_pelanggan' => 'required|integer',
+            'tanggal_transaksi' => 'required|date',
+            'total_transaksi' => 'required|numeric'
+    ]);
+
+    // edit data
+    DB::table('t_transaksi')->where('id_transaksi', $id)->update([
+        'id_pelanggan' => $request->id_pelanggan,
+        'tanggal_transaksi' => $request->tanggal_transaksi,
+        'total_transaksi' => $request->total_transaksi
+    ]);
+
+    return response()->json([
+            'success' => true,
+            'message' => 'Transaksi berhasil diedit'
+        ], JsonResponse::HTTP_OK);
+
+
+
+}
+
 
 
 

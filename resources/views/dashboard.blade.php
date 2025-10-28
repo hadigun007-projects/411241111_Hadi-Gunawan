@@ -212,9 +212,8 @@
 
   <script>
 
-
-
-
+    let mode;
+    let editedId;
     
     // Tab logic (vanilla JS, accessible-ish)
     (function () {
@@ -273,6 +272,32 @@
       if(id_pelanggan === '' || tanggal_transaksi === '' || total_transaksi === ''){
         alert('Semua field harus diisi')
         return
+      }
+
+      if(mode == 'edit'){
+        const res = await fetch('/edit/'+editedId, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        },
+        body: JSON.stringify({
+          id_pelanggan,
+          tanggal_transaksi,
+          total_transaksi
+        })
+      })
+
+      const data = await res.json()
+
+      if(data.success){
+        alert(data.message)
+        modal.style.display = 'none';
+        location.reload()
+      }else{
+        alert(data.message)
+      }
+        return;
       }
 
       const res = await fetch('/create', {
@@ -340,22 +365,24 @@
     
     async function editTransaksi(id, id_pelanggan, tanggal_transaksi, total_transaksi) {
 
-      modal.style.display = 'flex';
-
-      console.log([
-        tanggal_transaksi
-      ]);
-      console.log([
-        id, id_pelanggan, tanggal_transaksi, total_transaksi
-      ]);
-     
       if (tanggal_transaksi.length === 10) {
         tanggal_transaksi = `${tanggal_transaksi}T00:00`;
       }
 
+      mode = 'edit';
+      editedId = id;
+
       document.getElementById('id_pelanggan').value = id_pelanggan
       document.getElementById('tanggal_transaksi').value = tanggal_transaksi
       document.getElementById('total_transaksi').value = total_transaksi
+
+      modal.style.display = 'flex';
+
+
+      // if(id_pelanggan === '' || tanggal_transaksi === '' || total_transaksi === ''){
+      //   alert('Semua field harus diisi')
+      //   return
+      // }
 
     //   const res = await fetch('/destroy/'+id, {
     //     method: 'DELETE',
