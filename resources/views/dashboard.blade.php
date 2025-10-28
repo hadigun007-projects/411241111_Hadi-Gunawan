@@ -149,7 +149,7 @@
               </tr>
               </thead>
               <tbody>
-              @foreach($joined as $row)
+                @foreach($joined as $row)
                 <tr>
                   <td>{{ $row->id_pelanggan ?? $row->pelanggan_id ?? $row->id }}</td>
                   <td>{{ $row->nama_pelanggan }}</td>
@@ -158,7 +158,7 @@
                   <td>{{ \Illuminate\Support\Carbon::parse($row->tanggal_transaksi)->format('Y-m-d H:i') }}</td>
                   <td class="right">Rp {{ number_format($row->total_transaksi, 0, ',', '.') }}</td>
                   <td style="display:flex; justify-content:flex-end;gap: 10px;">
-                    <button style="cursor:pointer;" type="button">Edit</button>
+                    <button style="cursor:pointer;" onclick="editTransaksi({{$row->id_transaksi}}, {{$row->id_pelanggan}}, '{{$row->tanggal_transaksi}}', {{$row->total_transaksi}})" type="button">Edit</button>
                     <button style="cursor:pointer;" onclick="deleteTransaksi({{$row->id_transaksi}})" type="button">Hapus</button>
                   </td>
                 </tr>
@@ -181,7 +181,7 @@
       ✖
     </button>
 
-    <h3 style="margin:0 0 16px 0;">Tambah Transaksi Baru</h3>
+      <h3 id="modalTitle" style="margin:0 0 16px 0;">Tambah/Edit Transaksi Baru</h3>
 
       <div style="margin-bottom:12px;">
         <label for="id_pelanggan">Pelanggan</label><br>
@@ -316,12 +316,12 @@
       })
 
      let data
-try {
-  data = await res.json()
-} catch (e) {
-  alert('Gagal menghapus: respon tidak valid.')
-  return
-}
+      try {
+        data = await res.json()
+      } catch (e) {
+        alert('Gagal menghapus: respon tidak valid.')
+        return
+      }
 
       if(data.success){
         alert(data.message)
@@ -330,6 +330,57 @@ try {
       }else{
         alert(data.message)
       }
+    }
+
+    function toDatetimeLocal(value) {
+      // value: 'YYYY-MM-DD HH:MM:SS' → 'YYYY-MM-DDTHH:MM'
+      return value.replace(' ', 'T').slice(0, 16)
+    }
+    
+    
+    async function editTransaksi(id, id_pelanggan, tanggal_transaksi, total_transaksi) {
+
+      modal.style.display = 'flex';
+
+      console.log([
+        tanggal_transaksi
+      ]);
+      console.log([
+        id, id_pelanggan, tanggal_transaksi, total_transaksi
+      ]);
+     
+      if (tanggal_transaksi.length === 10) {
+        tanggal_transaksi = `${tanggal_transaksi}T00:00`;
+      }
+
+      document.getElementById('id_pelanggan').value = id_pelanggan
+      document.getElementById('tanggal_transaksi').value = tanggal_transaksi
+      document.getElementById('total_transaksi').value = total_transaksi
+
+    //   const res = await fetch('/destroy/'+id, {
+    //     method: 'DELETE',
+    //     headers: {
+    //       'Content-Type': 'application/json',
+    //       'Accept': 'application/json',
+    //       'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    //     },
+    //   })
+
+    //  let data
+    //   try {
+    //     data = await res.json()
+    //   } catch (e) {
+    //     alert('Gagal menghapus: respon tidak valid.')
+    //     return
+    //   }
+
+    //   if(data.success){
+    //     alert(data.message)
+    //     modal.style.display = 'none';
+    //     location.reload()
+    //   }else{
+    //     alert(data.message)
+    //   }
     }
 
   </script>
